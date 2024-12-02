@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query, UploadFile, File
 from datetime import datetime
-from models import predicts
+
+from app.models import predicts
 
 router = APIRouter(prefix="/predicts", tags=["Predicts"])
 

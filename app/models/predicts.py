@@ -2,7 +2,8 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 from enum import Enum
-from models import auths
+
+from app.models import auths
 
 
 class PlantType(str, Enum):

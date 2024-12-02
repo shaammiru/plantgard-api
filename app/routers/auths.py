@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from models import auths
+
+from app.models import auths
 
 router = APIRouter(prefix="/auths", tags=["Auths"])
 
