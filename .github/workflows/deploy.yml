@@ -29,7 +29,7 @@ jobs:
       # Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t gcr.io/$GCP_PROJECT_ID/fastapi-app:$GITHUB_SHA .
+          docker build -t gcr.io/${secrets.GCP_PROJECT_ID}/fastapi-app:$GITHUB_SHA .
 
       # Authenticate dengan Google Cloud menggunakan Service Account
       - name: Google Cloud Authentication
