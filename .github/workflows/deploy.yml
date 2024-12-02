@@ -26,16 +26,21 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Build Docker image
-      - name: Build Docker image
-        run: |
-          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/plantgard-registry/plantgard-api:$GITHUB_SHA .
-
       # Authenticate with Google Cloud using Service Account
       - name: Google Cloud Authentication
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      # Configure docker for artifact registry
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-southeast1-docker.pkg.dev
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/plantgard-registry/plantgard-api:$GITHUB_SHA .
 
       # Push Docker image to Google Container Registry (GCR)
       - name: Push Docker image to GCR
