@@ -1,5 +1,4 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
 
 
 class User(BaseModel):
@@ -23,17 +22,33 @@ class LoginRequest(BaseModel):
     )
 
 
-class RegisterResponse(BaseModel):
+class RegisterData(BaseModel):
+    user: User
+
+
+class RegisterSuccessResponse(BaseModel):
     message: str
-    errors: Optional[str] = None
-    data: User
+    errors: None
+    data: RegisterData
 
 
-class Token(BaseModel):
+class RegisterFailedResponse(BaseModel):
+    message: str
+    errors: str
+    data: None
+
+
+class LoginData(BaseModel):
     token: str
 
 
-class LoginResponse(BaseModel):
+class LoginSuccessResponse(BaseModel):
     message: str
-    errors: Optional[str] = None
-    data: Token
+    errors: None
+    data: LoginData
+
+
+class LoginFailedResponse(BaseModel):
+    message: str
+    errors: str
+    data: None

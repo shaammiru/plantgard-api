@@ -26,6 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Write serviceAccount.json file
+      - name: Create serviceAccount.json
+        run: |
+          echo "${{ secrets.GCP_SA_KEY }}" > serviceAccount.json
+
       # Authenticate with Google Cloud using Service Account
       - name: Google Cloud Authentication
         uses: google-github-actions/auth@v2
@@ -42,8 +47,8 @@ jobs:
         run: |
           docker build -t asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/plantgard-registry/plantgard-api:$GITHUB_SHA .
 
-      # Push Docker image to Google Container Registry (GCR)
-      - name: Push Docker image to GCR
+      # Push Docker image to artifact Registry
+      - name: Push Docker image to Artifact Registry
         run: |
           docker push asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/plantgard-registry/plantgard-api:$GITHUB_SHA
 
@@ -54,4 +59,6 @@ jobs:
             --image asia-southeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/plantgard-registry/plantgard-api:$GITHUB_SHA \
             --platform managed \
             --region asia-southeast1 \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars PORT=${{ secrets.PORT }} \
+            --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}

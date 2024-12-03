@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
 from enum import Enum
 
 from app.models import auths
@@ -27,13 +26,25 @@ class PredictionResult(BaseModel):
     updatedAt: datetime
 
 
-class PredictionResponse(BaseModel):
+class PredictionSuccessResponse(BaseModel):
     message: str
-    errors: Optional[str]
+    errors: None
     data: PredictionResult
 
 
-class PredictionHistoriesResponse(BaseModel):
+class PredictionFailedResponse(BaseModel):
     message: str
-    errors: Optional[str]
+    errors: str
+    data: None
+
+
+class PredictionHistoriesSuccessResponse(BaseModel):
+    message: str
+    errors: str
     data: list[PredictionResult]
+
+
+class PredictionHistoriesFailedResponse(BaseModel):
+    message: str
+    errors: str
+    data: None
