@@ -1,6 +1,11 @@
+import firebase_admin
+from firebase_admin import credentials
 from fastapi import APIRouter
 
 from app.models import auths
+
+cred = credentials.Certificate("serviceAccount.json")
+firebase_admin.initialize_app(cred)
 
 router = APIRouter(prefix="/auths", tags=["Auths"])
 
