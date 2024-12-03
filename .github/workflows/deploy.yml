@@ -57,4 +57,4 @@ jobs:
             --allow-unauthenticated \
             --max-instances 3 \
             --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
-            --set-env-vars SERVICE_ACCOUNT=${{ secrets.SA_JSON_KEY }}
+            --set-env-vars SERVICE_ACCOUNT=${{ secrets.SA_BASE64_KEY }}

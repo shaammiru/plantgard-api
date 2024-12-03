@@ -1,5 +1,6 @@
 import os
 import json
+import base64
 import uvicorn
 import firebase_admin
 from dotenv import load_dotenv
@@ -10,8 +11,11 @@ from app.routers import predicts, auths
 
 load_dotenv()
 
-service_account_json = os.getenv("SERVICE_ACCOUNT")
-service_account_cred = json.loads(service_account_json)
+encoded_service_account = os.getenv("SA_BASE64_KEY")
+if encoded_service_account:
+    service_account_json = base64.b64decode(encoded_service_account).decode("utf-8")
+    service_account_cred = json.loads(service_account_json)
+
 cred = credentials.Certificate(service_account_cred)
 firebase_admin.initialize_app(cred)
 
