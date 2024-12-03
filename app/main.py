@@ -24,7 +24,11 @@ app = FastAPI(
         {
             "url": "http://localhost:8080",
             "description": "Local Development Server",
-        }
+        },
+        {
+            "url": "https://plantgard-api-684536012763.asia-southeast1.run.app",
+            "description": "Production Server",
+        },
     ]
 )
 
