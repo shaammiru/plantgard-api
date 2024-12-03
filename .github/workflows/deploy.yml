@@ -26,11 +26,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Write serviceAccount.json file
-      - name: Create serviceAccount.json
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > serviceAccount.json
-
       # Authenticate with Google Cloud using Service Account
       - name: Google Cloud Authentication
         uses: google-github-actions/auth@v2
@@ -60,4 +55,6 @@ jobs:
             --platform managed \
             --region asia-southeast1 \
             --allow-unauthenticated \
-            --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+            --max-instances 3 \
+            --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
+            --set-env-vars SERVICE_ACCOUNT=${{ secrets.GCP_SA_KEY }}

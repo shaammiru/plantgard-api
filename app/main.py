@@ -1,4 +1,5 @@
 import os
+import json
 import uvicorn
 import firebase_admin
 from dotenv import load_dotenv
@@ -9,7 +10,9 @@ from app.routers import predicts, auths
 
 load_dotenv()
 
-cred = credentials.Certificate("serviceAccount.json")
+service_account_json = os.getenv("SERVICE_ACCOUNT")
+service_account_cred = json.loads(service_account_json)
+cred = credentials.Certificate(service_account_cred)
 firebase_admin.initialize_app(cred)
 
 app = FastAPI(
