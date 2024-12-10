@@ -18,21 +18,43 @@ async def predict_plant(
     plants: predicts_model.PlantType = Query(...),
     image: UploadFile = File(...),
 ):
+    """
+    Endpoint untuk memprediksi penyakit tanaman berdasarkan jenis tanaman dan gambar yang diunggah.
+    """
     try:
-        if plants == predicts_model.PlantType.chili:
-            plant_type = "Chili"
-        elif plants == predicts_model.PlantType.corn:
-            plant_type = "Corn"
-        else:
-            plant_type = "Rice"
+        # Validasi tipe tanaman
+        if plants not in [predicts_model.PlantType.chili, predicts_model.PlantType.corn, predicts_model.PlantType.rice]:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": "Invalid plant type",
+                    "errors": "plant_validation_error",
+                    "data": None,
+                },
+            )
 
+        # Validasi tipe file
+        if image.content_type not in ["image/jpeg", "image/png"]:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": "Invalid file type. Only JPEG and PNG are allowed.",
+                    "errors": "file_validation_error",
+                    "data": None,
+                },
+            )
+
+        # Tentukan jenis tanaman
+        plant_type = plants.value.capitalize()
+
+        # Mock hasil prediksi
         prediction_result = {
             "plant_type": plant_type,
             "disease": {
                 "type": "Example Disease",
                 "description": "Example disease is a bla bla bla.",
-                "treatment": "Disesase treatment.",
-                "prevention": "Disesase prevention.",
+                "treatment": "Disease treatment.",
+                "prevention": "Disease prevention.",
             },
             "user": {
                 "uid": "example uid",
@@ -52,13 +74,12 @@ async def predict_plant(
             },
         )
     except Exception as e:
-        print(str(e))
-
+        # Tangani error tidak terduga
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
-                "message": "prediction failed",
-                "errors": "internal server error",
+                "message": "Prediction failed",
+                "errors": str(e),
                 "data": None,
             },
         )
@@ -72,14 +93,18 @@ async def predict_plant(
     },
 )
 async def get_predict_histories():
+    """
+    Endpoint untuk mendapatkan histori prediksi penyakit tanaman.
+    """
     try:
+        # Mock data histori
         prediction_result = {
             "plant_type": "Chili",
             "disease": {
                 "type": "Example Disease",
                 "description": "Example disease is a bla bla bla.",
-                "treatment": "Disesase treatment.",
-                "prevention": "Disesase prevention.",
+                "treatment": "Disease treatment.",
+                "prevention": "Disease prevention.",
             },
             "user": {
                 "uid": "example uid",
@@ -101,13 +126,12 @@ async def get_predict_histories():
             },
         )
     except Exception as e:
-        print(str(e))
-
+        # Tangani error tidak terduga
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "message": "get histories failed",
-                "errors": "internal server error",
+                "errors": str(e),
                 "data": None,
             },
         )
