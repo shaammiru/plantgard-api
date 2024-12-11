@@ -63,4 +63,6 @@ jobs:
             --allow-unauthenticated \
             --max-instances 3 \
             --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
-            --set-env-vars SA_BASE64_KEY=${{ secrets.SA_BASE64_KEY }}
+            --set-env-vars SA_BASE64_KEY=${{ secrets.SA_BASE64_KEY }} \
+            --set-env-vars GCP_LOCATION=${{ secrets.GCP_LOCATION }} \
+            --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }}
