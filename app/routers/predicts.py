@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from datetime import datetime
 
 from app.models import predicts as predicts_model
+from app.services import predicts as predicts_service
 
 router = APIRouter(prefix="/predicts", tags=["Predicts"])
 
@@ -18,52 +19,32 @@ async def predict_plant(
     plants: predicts_model.PlantType = Query(...),
     image: UploadFile = File(...),
 ):
-    """
-    Endpoint untuk memprediksi penyakit tanaman berdasarkan jenis tanaman dan gambar yang diunggah.
-    """
     try:
-        # Validasi tipe tanaman
-        if plants not in [predicts_model.PlantType.chili, predicts_model.PlantType.corn, predicts_model.PlantType.rice]:
+        if plants not in [
+            predicts_model.PlantType.chili,
+            predicts_model.PlantType.corn,
+            predicts_model.PlantType.rice,
+        ]:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={
-                    "message": "Invalid plant type",
+                    "message": "invalid plant type",
                     "errors": "plant_validation_error",
                     "data": None,
                 },
             )
 
-        # Validasi tipe file
-        if image.content_type not in ["image/jpeg", "image/png"]:
+        if image.content_type not in ["image/jpeg", "image/jpg", "image/png"]:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={
-                    "message": "Invalid file type. Only JPEG and PNG are allowed.",
+                    "message": "invalid file type. Only JPEG and PNG are allowed.",
                     "errors": "file_validation_error",
                     "data": None,
                 },
             )
 
-        # Tentukan jenis tanaman
-        plant_type = plants.value.capitalize()
-
-        # Mock hasil prediksi
-        prediction_result = {
-            "plant_type": plant_type,
-            "disease": {
-                "type": "Example Disease",
-                "description": "Example disease is a bla bla bla.",
-                "treatment": "Disease treatment.",
-                "prevention": "Disease prevention.",
-            },
-            "user": {
-                "uid": "example uid",
-                "name": "John Doe",
-                "email": "john.doe@example.com",
-            },
-            "created_at": datetime.now().isoformat(),
-            "updated_at": datetime.now().isoformat(),
-        }
+        prediction_result = predicts_service.predict_image(plants, image)
 
         return JSONResponse(
             status_code=status.HTTP_200_OK,
@@ -74,12 +55,12 @@ async def predict_plant(
             },
         )
     except Exception as e:
-        # Tangani error tidak terduga
+        print(str(e))
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
-                "message": "Prediction failed",
-                "errors": str(e),
+                "message": "prediction failed",
+                "errors": "internal server error",
                 "data": None,
             },
         )
@@ -93,11 +74,7 @@ async def predict_plant(
     },
 )
 async def get_predict_histories():
-    """
-    Endpoint untuk mendapatkan histori prediksi penyakit tanaman.
-    """
     try:
-        # Mock data histori
         prediction_result = {
             "plant_type": "Chili",
             "disease": {
@@ -126,12 +103,12 @@ async def get_predict_histories():
             },
         )
     except Exception as e:
-        # Tangani error tidak terduga
+        print(str(e))
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "message": "get histories failed",
-                "errors": str(e),
+                "errors": "internal server error",
                 "data": None,
             },
         )

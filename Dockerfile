@@ -1,9 +1,14 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
+
+RUN mkdir /app/plant_models && \
+  wget -O /app/plant_models/chilli_model.keras https://storage.googleapis.com/plantgard-storage/models/chilli_model.keras && \
+  wget -O /app/plant_models/corn_model.keras https://storage.googleapis.com/plantgard-storage/models/corn_model.keras && \
+  wget -O /app/plant_models/rice_model.keras https://storage.googleapis.com/plantgard-storage/models/rice_model.keras
 
 COPY . /app/
 
