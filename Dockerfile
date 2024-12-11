@@ -6,9 +6,9 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN mkdir /app/plant_models && \
-  wget -O /app/plant_models/chilli_model.keras https://storage.googleapis.com/plantgard-storage/models/chilli_model.keras && \
-  wget -O /app/plant_models/corn_model.keras https://storage.googleapis.com/plantgard-storage/models/corn_model.keras && \
-  wget -O /app/plant_models/rice_model.keras https://storage.googleapis.com/plantgard-storage/models/rice_model.keras
+  curl -O /app/plant_models/chilli_model.keras https://storage.googleapis.com/plantgard-storage/models/chilli_model.keras && \
+  curl -O /app/plant_models/corn_model.keras https://storage.googleapis.com/plantgard-storage/models/corn_model.keras && \
+  curl -O /app/plant_models/rice_model.keras https://storage.googleapis.com/plantgard-storage/models/rice_model.keras
 
 COPY . /app/
 
