@@ -32,6 +32,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      # Configure gcloud CLI
+      - name: Configure gcloud CLI
+        run: |
+          gcloud auth application-default login
+
       # Configure docker for artifact registry
       - name: Configure Docker for Artifact Registry
         run: |
