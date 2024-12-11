@@ -32,12 +32,6 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      # Set GOOGLE_APPLICATION_CREDENTIALS
-      - name: Set GOOGLE_APPLICATION_CREDENTIALS
-        run: |
-          echo "${{ secrets.GCP_SA_KEY }}" > /tmp/credentials.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/credentials.json
-
       # Configure docker for artifact registry
       - name: Configure Docker for Artifact Registry
         run: |
@@ -65,4 +59,5 @@ jobs:
             --set-env-vars FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }} \
             --set-env-vars SA_BASE64_KEY=${{ secrets.SA_BASE64_KEY }} \
             --set-env-vars GCP_LOCATION=${{ secrets.GCP_LOCATION }} \
-            --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }}
+            --set-env-vars GCP_PROJECT=${{ secrets.GCP_PROJECT_ID }} \
+            --service-account admin-capstone@${{ secrets.GCP_PROJECT_ID }}.iam.gserviceaccount.com
