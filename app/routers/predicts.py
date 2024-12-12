@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Query, UploadFile, File, status
+from fastapi import APIRouter, Query, Depends, UploadFile, File, status
 from fastapi.responses import JSONResponse
 from datetime import datetime
 
 from app.models import predicts as predicts_model
 from app.services import predicts as predicts_service
+from app.middleware import auths as auths_middleware
+from app.helpers import errors as custom_errors
 
 router = APIRouter(prefix="/predicts", tags=["Predicts"])
 
@@ -14,6 +16,7 @@ router = APIRouter(prefix="/predicts", tags=["Predicts"])
         200: {"model": predicts_model.PredictionSuccessResponse},
         500: {"model": predicts_model.PredictionFailedResponse},
     },
+    dependencies=[Depends(auths_middleware.verify_token)],
 )
 async def predict_plant(
     plants: predicts_model.PlantType = Query(...),
@@ -72,6 +75,7 @@ async def predict_plant(
         200: {"model": predicts_model.PredictionHistoriesSuccessResponse},
         500: {"model": predicts_model.PredictionHistoriesFailedResponse},
     },
+    dependencies=[Depends(auths_middleware.verify_token)],
 )
 async def get_predict_histories():
     try:
@@ -102,6 +106,8 @@ async def get_predict_histories():
                 "data": prediction_histories,
             },
         )
+    except custom_errors.ResponseError as e:
+        return JSONResponse(status_code=e.status_code, content=e.detail)
     except Exception as e:
         print(str(e))
         return JSONResponse(

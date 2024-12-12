@@ -29,11 +29,7 @@ def register_user(request: auths_model.RegisterRequest):
 def login_user(request: auths_model.LoginRequest):
     firebase_api_key = os.getenv("FIREBASE_API_KEY")
     if not firebase_api_key:
-        raise custom_errors.ResponseError(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            message="internal server error",
-            errors="firebase api key not found",
-        )
+        raise Exception
 
     url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={firebase_api_key}"
 
@@ -67,5 +63,50 @@ def login_user(request: auths_model.LoginRequest):
     return {
         "message": "login success",
         "errors": None,
-        "data": {"token": response_data["idToken"]},
+        "data": {
+            "token": response_data["idToken"],
+            "refresh_token": response_data["refreshToken"],
+        },
+    }
+
+
+def exchange_refresh_token(request: auths_model.RefreshRequest):
+    firebase_api_key = os.getenv("FIREBASE_API_KEY")
+    if not firebase_api_key:
+        raise Exception
+
+    url = f"https://securetoken.googleapis.com/v1/token?key={firebase_api_key}"
+
+    payload = {
+        "grant_type": "refresh_token",
+        "refresh_token": request.refresh_token,
+    }
+
+    response = requests.post(url, data=payload)
+
+    response_data = response.json()
+
+    if response.status_code != 200:
+        error_message = response_data.get("error", {}).get(
+            "message", "exchange token failed"
+        )
+
+        match error_message:
+            case "INVALID_REFRESH_TOKEN":
+                raise custom_errors.ResponseError(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    message="exchange token failed",
+                    errors="invalid refresh token",
+                )
+
+            case _:
+                raise Exception
+
+    return {
+        "message": "exchange token success",
+        "errors": None,
+        "data": {
+            "token": response_data["id_token"],
+            "refresh_token": response_data["refresh_token"],
+        },
     }

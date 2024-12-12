@@ -22,6 +22,10 @@ class LoginRequest(BaseModel):
     )
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
 class RegisterData(BaseModel):
     user: User
 
@@ -32,14 +36,9 @@ class RegisterSuccessResponse(BaseModel):
     data: RegisterData
 
 
-class RegisterFailedResponse(BaseModel):
-    message: str
-    errors: str
-    data: None
-
-
 class LoginData(BaseModel):
     token: str
+    refesh_token: str
 
 
 class LoginSuccessResponse(BaseModel):
@@ -48,7 +47,7 @@ class LoginSuccessResponse(BaseModel):
     data: LoginData
 
 
-class LoginFailedResponse(BaseModel):
+class RefreshResponse(BaseModel):
     message: str
-    errors: str
-    data: None
+    errors: None
+    data: LoginData
