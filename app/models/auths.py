@@ -7,6 +7,16 @@ class User(BaseModel):
     email: EmailStr
 
 
+class FullUser(BaseModel):
+    uid: str
+    email: EmailStr
+    name: str
+    phone_number: str | None
+    photo_url: str | None
+    email_verified: bool
+    disabled: bool
+
+
 class RegisterRequest(BaseModel):
     name: str = Field(..., description="User's full name")
     email: EmailStr
@@ -51,3 +61,13 @@ class RefreshResponse(BaseModel):
     message: str
     errors: None
     data: LoginData
+
+
+class GetProfileData(BaseModel):
+    user: FullUser
+
+
+class GetProfileResponse(BaseModel):
+    message: str
+    errors: None
+    data: GetProfileData
