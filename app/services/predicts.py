@@ -72,7 +72,7 @@ def preprocess_image(uploadImage: UploadFile):
     return np.expand_dims(image_array, axis=0)
 
 
-def predict_image(plants: predicts_model.PlantType, image: UploadFile):
+def predict_image(plants: predicts_model.PlantType, image: UploadFile, user: any):
     if plants == predicts_model.PlantType.chili:
         model = load_model("plant_models/chili_model.keras")
         disease_class = chili_disease_class
@@ -99,9 +99,9 @@ def predict_image(plants: predicts_model.PlantType, image: UploadFile):
             "prevention": response["prevention"],
         },
         "user": {
-            "uid": "example uid",
-            "name": "John Doe",
-            "email": "john.doe@example.com",
+            "uid": user["uid"],
+            "name": user["name"],
+            "email": user["email"],
         },
         "created_at": datetime.now().isoformat(),
         "updated_at": datetime.now().isoformat(),

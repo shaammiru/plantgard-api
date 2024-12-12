@@ -1,11 +1,10 @@
-from fastapi import APIRouter, Query, Depends, UploadFile, File, status
+from fastapi import APIRouter, Query, Depends, Request, UploadFile, File, status
 from fastapi.responses import JSONResponse
-from datetime import datetime
 
 from app.models import predicts as predicts_model
 from app.services import predicts as predicts_service
 from app.middleware import auths as auths_middleware
-from app.helpers import errors as custom_errors
+from app.helpers import errors as custom_errors, firebase
 
 router = APIRouter(prefix="/predicts", tags=["Predicts"])
 
@@ -19,10 +18,17 @@ router = APIRouter(prefix="/predicts", tags=["Predicts"])
     dependencies=[Depends(auths_middleware.verify_token)],
 )
 async def predict_plant(
+    request: Request,
     plants: predicts_model.PlantType = Query(...),
     image: UploadFile = File(...),
 ):
     try:
+        user = {
+            "uid": request.state.decoded["user_id"],
+            "name": request.state.decoded["name"],
+            "email": request.state.decoded["email"],
+        }
+
         if plants not in [
             predicts_model.PlantType.chili,
             predicts_model.PlantType.corn,
@@ -47,7 +53,8 @@ async def predict_plant(
                 },
             )
 
-        prediction_result = predicts_service.predict_image(plants, image)
+        prediction_result = predicts_service.predict_image(plants, image, user)
+        firebase.db.collection("predictions").add(prediction_result)
 
         return JSONResponse(
             status_code=status.HTTP_200_OK,
@@ -77,26 +84,15 @@ async def predict_plant(
     },
     dependencies=[Depends(auths_middleware.verify_token)],
 )
-async def get_predict_histories():
+async def get_predict_histories(request: Request):
     try:
-        prediction_result = {
-            "plant_type": "Chili",
-            "disease": {
-                "type": "Example Disease",
-                "description": "Example disease is a bla bla bla.",
-                "treatment": "Disease treatment.",
-                "prevention": "Disease prevention.",
-            },
-            "user": {
-                "uid": "example uid",
-                "name": "John Doe",
-                "email": "john.doe@example.com",
-            },
-            "created_at": datetime.now().isoformat(),
-            "updated_at": datetime.now().isoformat(),
-        }
+        prediction_ref = firebase.db.collection("predictions")
+        query = prediction_ref.where("user.uid", "==", request.state.decoded["user_id"])
+        prediction_stream = query.stream()
 
-        prediction_histories = [prediction_result] * 3
+        prediction_histories = []
+        for prediction in prediction_stream:
+            prediction_histories.append(prediction.to_dict())
 
         return JSONResponse(
             status_code=status.HTTP_200_OK,

@@ -1,10 +1,9 @@
-from fastapi import Header, status
-from fastapi.responses import JSONResponse
+from fastapi import Header, Request, status
 from firebase_admin import auth
 from app.helpers import errors as custom_errors
 
 
-def verify_token(authorization: str = Header(...)):
+def verify_token(request: Request, authorization: str = Header(...)):
     try:
         if not authorization.startswith("Bearer "):
             raise custom_errors.ResponseError(
@@ -23,32 +22,24 @@ def verify_token(authorization: str = Header(...)):
             )
 
         decoded = auth.verify_id_token(token)
+        request.state.decoded = decoded
 
         return decoded
     except auth.InvalidIdTokenError:
-        return JSONResponse(
+        raise custom_errors.ResponseError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={
-                "message": "authorization failed",
-                "errors": "invalid token",
-                "data": None,
-            },
+            message="authorization failed",
+            errors="invalid token",
         )
     except auth.ExpiredIdTokenError:
-        return JSONResponse(
+        raise custom_errors.ResponseError(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content={
-                "message": "authorization failed",
-                "errors": "expired token",
-                "data": None,
-            },
+            message="authorization failed",
+            errors="expired token",
         )
     except Exception:
-        return JSONResponse(
+        raise custom_errors.ResponseError(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={
-                "message": "authorization failed",
-                "errors": "internal server error",
-                "data": None,
-            },
+            message="authorization failed",
+            errors="internal server error",
         )
