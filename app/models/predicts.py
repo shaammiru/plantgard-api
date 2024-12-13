@@ -22,8 +22,8 @@ class PredictionResult(BaseModel):
     plant_type: str
     disease: Disease
     user: auths.User
-    createdAt: datetime
-    updatedAt: datetime
+    created_at: datetime
+    updated_at: datetime
 
 
 class PredictionSuccessResponse(BaseModel):
